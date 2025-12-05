@@ -14,11 +14,13 @@ router.post(
   "/upload-excel",
   cloudFileUpload({
     validation: [
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel", // .xls
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
     ],
   }).single("xlsx"),
   crudController.uploadFile
 );
+router.delete("/deleteAll", crudController.deleteAll);
 
 
 // ===== GET ONE =====

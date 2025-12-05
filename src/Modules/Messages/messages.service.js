@@ -33,6 +33,19 @@ export const getAll = async (req, res, next) => {
   }
 };
 
+export const deleteAll = async (req, res, next) => {
+  try {
+    const deleted = await ExcelRecord.deleteMany({});
+    return successRespons({
+      res,
+      message: "All data deleted successfully",
+      data: deleted,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // ===== GET ONE =====
 export const getOne = async (req, res, next) => {
   try {
@@ -105,28 +118,34 @@ export const uploadFile = async (req, res, next) => {
     // تحويل الشيت لـ JSON
     const rows = XLSX.utils.sheet_to_json(sheet);
 
-    // هنا ممكن تعمل map إذا حابب تظبط أسماء الأعمدة
-    const dataToInsert = rows.map((row) => ({
-      landLocation: row["مكان الأرض"],
-      committee: row["اللجنه"],
-      center: row["المركز"],
-      unit: row["الوحدة"],
-      area: Number(row["المساحة"]),
-      type: row["نوعه"],
-      requestDate: new Date(row["تاريخ الطلب"]),
-      requestNumber: row["رقم الطلب"],
-      requestedFor: row["الطلب لصالح"],
-      phone: row["التليفون"],
-      applicantName: row["مقدم الطلب"],
-      nationalId: row["الرقم القومى"],
-    }));
+    // تنظيف الأعمدة وتحويل التاريخ لو رقم Excel
+    const dataToInsert = rows.map((row) => {
+      const newRow = {};
+      for (let key in row) {
+        const cleanKey = key.trim().replace(/\s+/g, "_"); // استبدل المسافات بـ "_"
+        let value = row[key];
+
+        // تحويل التواريخ لو الرقم ممكن يكون تاريخ Excel
+        if (typeof value === "number" && cleanKey.toLowerCase().includes("تاريخ")) {
+          value = new Date((value - 25569) * 86400 * 1000);
+        }
+
+        newRow[cleanKey] = value;
+      }
+      return newRow;
+    });
+
+    console.log("DATA: ", dataToInsert);
 
     // حفظ البيانات في MongoDB
+    // لازم schema يكون ديناميكي: { strict: false }
     const saved = await ExcelRecord.insertMany(dataToInsert);
 
     res.json({
       message: "Excel imported successfully!",
       inserted: saved.length,
+      rows,
+      dataToInsert,
     });
   } catch (err) {
     next(err);
