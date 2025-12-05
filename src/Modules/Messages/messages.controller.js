@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as crudController from "./messages.service.js";
+import { cloudFileUpload } from "../../Utils/multer/cloud.multer.js";
 
 const router = Router();
 
@@ -8,6 +9,17 @@ router.post("/create", crudController.create);
 
 // ===== GET ALL =====
 router.get("/getAll", crudController.getAll);
+
+router.post(
+  "/upload-excel",
+  cloudFileUpload({
+    validation: [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ],
+  }).single("xlsx"),
+  crudController.uploadFile
+);
+
 
 // ===== GET ONE =====
 router.get("/getOne/:id", crudController.getOne);

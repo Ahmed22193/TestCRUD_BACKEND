@@ -1,42 +1,50 @@
 import mongoose, { Schema } from "mongoose";
 
-const TestMessageSchema = new Schema(
+const ExcelRecordSchema = new Schema(
   {
-    // الاسم لأي تجربة
-    name: {
-      type: String,
-      required: true,
-      minLength: 2,
-      maxLength: 100,
+    landLocation: {
+      type: String, // مكان الأرض
     },
-    // الرقم القومي كمثال
+    committee: {
+      type: String, // اللجنة
+    },
+    center: {
+      type: String, // المركز
+    },
+    unit: {
+      type: String, // الوحدة
+    },
+    area: {
+      type: Number, // المساحة (مثلاً 10 فدان)
+    },
+    type: {
+      type: String, // نوعه (واضع يد)
+    },
+    requestDate: {
+      type: Date, // تاريخ الطلب
+    },
+    requestNumber: {
+      type: String, // رقم الطلب (138783/57)
+    },
+    requestedFor: {
+      type: String, // الطلب لصالح (مواطن)
+    },
+    phone: {
+      type: String, // التليفون
+    },
+    applicantName: {
+      type: String, // مقدم الطلب
+    },
     nationalId: {
-      type: String,
-      required: true,
+      type: String, // الرقم القومي
       unique: true,
-      length: 14, // افتراض الرقم القومي المصري
-    },
-    // محتوى الرسالة
-    content: {
-      type: String,
-      required: true,
-      minLength: 2,
-      maxLength: 2000,
-    },
-    // صورة / مرفق
-    attachment: {
-      secure_url: { type: String },
-      public_id: { type: String },
-    },
-    // أي بيانات إضافية للتجربة
-    notes: {
-      type: String,
-      default: "",
     },
   },
   { timestamps: true }
 );
 
-const TestMessage = mongoose.models.TestMessage || mongoose.model("TestMessage", TestMessageSchema);
+const ExcelRecord =
+  mongoose.models.ExcelRecord ||
+  mongoose.model("ExcelRecord", ExcelRecordSchema);
 
-export default TestMessage;
+export default ExcelRecord;
